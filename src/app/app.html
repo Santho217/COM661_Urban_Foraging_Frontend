@@ -1,63 +1,182 @@
 
+<!-- Urban Foraging Explorer - COM661 Coursework 2 -->
+
 <header class="site-header">
   <div class="container">
     <h2>🌿 Urban Foraging Explorer</h2>
+
     <nav>
       <a href="#home">Home</a>
       <a href="#explore">Explore</a>
+      <a href="#database">Foraging Spots</a>
       <a href="#about">About</a>
     </nav>
   </div>
 </header>
 
 <main>
+
+  <!-- Homepage welcome section -->
   <section class="hero" id="home">
     <div class="container">
+
       <p class="eyebrow">DISCOVER URBAN NATURE</p>
+
       <h1>Explore the nature around you</h1>
+
       <p>
         Discover plants, explore foraging locations,
         and learn more about your local environment.
       </p>
-      <a class="primary-button" href="#explore">
+
+      <a class="primary-button" href="#database">
         Explore Locations
       </a>
+
     </div>
   </section>
 
+  <!-- Main features -->
   <section class="features container" id="explore">
+
     <h2>What can you explore?</h2>
+
     <div class="feature-grid">
+
       <article class="feature-card">
         <h3>🌱 Foraging Spots</h3>
-        <p>Browse plant locations from our database.</p>
+        <p>
+          Browse plant locations from our database
+          and learn about different plant species.
+        </p>
       </article>
 
       <article class="feature-card">
         <h3>📍 Nearby Locations</h3>
-        <p>Find interesting places near your location.</p>
+        <p>
+          Find interesting foraging locations
+          using location-based search.
+        </p>
       </article>
 
       <article class="feature-card">
         <h3>🧮 Harvest Calculator</h3>
-        <p>Use our calculator to plan and understand quantities.</p>
+        <p>
+          Use our calculator to plan and
+          understand harvesting quantities.
+        </p>
       </article>
+
     </div>
   </section>
 
-  <section class="about" id="about">
-    <div class="container">
-      <h2>About This Project</h2>
-      <p>
-        Urban Foraging Explorer is a student project built
-        using Angular, Flask and MongoDB.
-        All demonstration locations are fictional and
-        must not be used as real foraging guidance.
-      </p>
-    </div>
+  <!-- Foraging spots loaded from Flask API -->
+  <section class="features container" id="database">
+
+    <h2>Foraging Spots from Our Database</h2>
+
+    <p>
+      The following records come from our
+      Urban Foraging API and MongoDB database.
+    </p>
+
+    <p>
+      Important: These are fictional demonstration
+      locations. Plant safety and hazard ratings
+      have not been verified.
+    </p>
+
+    <!-- Loading message -->
+    @if (loading()) {
+
+      <p>Loading foraging spots...</p>
+
+    } @else if (error()) {
+
+      <!-- Error message -->
+      <p>{{ error() }}</p>
+
+    } @else {
+
+      <!-- Database records -->
+      <div class="feature-grid">
+
+        @for (spot of spots(); track spot.spot_id) {
+
+          <article class="feature-card">
+
+            <h3>🌱 {{ spot.title }}</h3>
+
+            <p>
+              <strong>Plant:</strong>
+              {{ spot.plant_species }}
+            </p>
+
+            <p>
+              <strong>Category:</strong>
+              {{ spot.category }}
+            </p>
+
+            <p>
+              <strong>Spot ID:</strong>
+              {{ spot.spot_id }}
+            </p>
+
+            <p>
+              <strong>Hazard Rating:</strong>
+              {{ spot.hazard_rating }}
+            </p>
+
+          </article>
+
+        } @empty {
+
+          <p>No foraging spots found.</p>
+
+        }
+
+      </div>
+
+    }
+
   </section>
+
+  <!-- Project information -->
+  <section class="about" id="about">
+
+    <div class="container">
+
+      <h2>About This Project</h2>
+
+      <p>
+        Urban Foraging Explorer is a student project
+        developed for COM661 Coursework 2.
+      </p>
+
+      <p>
+        This website uses Angular for the frontend,
+        Flask for the backend API, and MongoDB
+        for storing and managing information.
+      </p>
+
+      <p>
+        The project helps users explore information
+        about plant species and foraging locations.
+        All demonstration locations are fictional
+        and must not be used as real foraging guidance.
+      </p>
+
+    </div>
+
+  </section>
+
 </main>
 
+<!-- Website footer -->
 <footer class="site-footer">
-  <p>COM661 Coursework 2 | Urban Foraging Explorer</p>
+
+  <p>
+    COM661 Coursework 2 | Urban Foraging Explorer
+  </p>
+
 </footer>

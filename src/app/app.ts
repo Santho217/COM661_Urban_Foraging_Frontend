@@ -1,12 +1,44 @@
-import { Component, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+
+import { Component, inject, OnInit, signal } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+
+interface ForagingSpot {
+  spot_id: string;
+  title: string;
+  plant_species: string;
+  category: string;
+  hazard_rating: string;
+}
+
+interface SpotsResponse {
+  count: number;
+  data_status: string;
+  spots: ForagingSpot[];
+}
 
 @Component({
-  imports: [RouterOutlet],
   selector: 'app-root',
-  styleUrl: './app.css',
+  imports: [],
   templateUrl: './app.html',
+  styleUrl: './app.css'
 })
-export class App {
-  protected readonly title = signal('COM661_Urban_Foraging_Frontend');
+export class App implements OnInit {
+  private http = inject(HttpClient);
+
+  spots = signal<ForagingSpot[]>([]);
+  loading = signal(true);
+  error = signal('');
+
+  ngOnInit(): void {
+    this.http.get<SpotsResponse>('/spots').subscribe({
+      next: (response) => {
+        this.spots.set(response.spots);
+        this.loading.set(false);
+      },
+      error: () => {
+        this.error.set('Unable to load foraging spots.');
+        this.loading.set(false);
+      }
+    });
+  }
 }
