@@ -1,5 +1,5 @@
 
-<!-- Urban Foraging Explorer - COM661 Coursework 2 -->
+<!-- COM661 Coursework 2 - Urban Foraging Explorer -->
 
 <header class="site-header">
   <div class="container">
@@ -16,10 +16,9 @@
 
 <main>
 
-  <!-- Homepage welcome section -->
+  <!-- Homepage -->
   <section class="hero" id="home">
     <div class="container">
-
       <p class="eyebrow">DISCOVER URBAN NATURE</p>
 
       <h1>Explore the nature around you</h1>
@@ -32,76 +31,121 @@
       <a class="primary-button" href="#database">
         Explore Locations
       </a>
-
     </div>
   </section>
 
-  <!-- Main features -->
+  <!-- Website features -->
   <section class="features container" id="explore">
-
     <h2>What can you explore?</h2>
 
     <div class="feature-grid">
-
       <article class="feature-card">
         <h3>🌱 Foraging Spots</h3>
         <p>
-          Browse plant locations from our database
-          and learn about different plant species.
+          Explore different plants and foraging
+          locations stored in our database.
         </p>
       </article>
 
       <article class="feature-card">
         <h3>📍 Nearby Locations</h3>
         <p>
-          Find interesting foraging locations
-          using location-based search.
+          Explore location-based information
+          about urban plants and nature.
         </p>
       </article>
 
       <article class="feature-card">
         <h3>🧮 Harvest Calculator</h3>
         <p>
-          Use our calculator to plan and
-          understand harvesting quantities.
+          Discover our planned calculator feature
+          for understanding harvesting quantities.
         </p>
       </article>
-
     </div>
   </section>
 
-  <!-- Foraging spots loaded from Flask API -->
+  <!-- Database and search section -->
   <section class="features container" id="database">
 
     <h2>Foraging Spots from Our Database</h2>
 
     <p>
-      The following records come from our
-      Urban Foraging API and MongoDB database.
+      Explore demonstration records loaded from our
+      Flask API and MongoDB database.
     </p>
 
     <p>
-      Important: These are fictional demonstration
-      locations. Plant safety and hazard ratings
-      have not been verified.
+      Important: All locations are fictional.
+      Plant safety and hazard ratings are unverified.
     </p>
 
-    <!-- Loading message -->
-    @if (loading()) {
+    <!-- Search controls -->
+    <div class="search-controls">
 
+      <div class="search-field">
+        <label for="plant-search">
+          Search for plants
+        </label>
+
+        <input
+          id="plant-search"
+          type="search"
+          placeholder="Search Hazel, Rowan, Daisy..."
+          [value]="searchTerm()"
+          #plantSearch
+          (input)="updateSearch(plantSearch.value)"
+        />
+      </div>
+
+      <div class="search-field">
+        <label for="category-filter">
+          Filter by category
+        </label>
+
+        <select
+          id="category-filter"
+          [value]="selectedCategory()"
+          #categoryFilter
+          (change)="updateCategory(categoryFilter.value)"
+        >
+          @for (category of categories(); track category) {
+            <option [value]="category">
+              {{ category }}
+            </option>
+          }
+        </select>
+      </div>
+
+      <button
+        type="button"
+        class="clear-button"
+        (click)="clearFilters()"
+      >
+        Clear Filters
+      </button>
+
+    </div>
+
+    <!-- Loading state -->
+    @if (loading()) {
       <p>Loading foraging spots...</p>
 
     } @else if (error()) {
-
-      <!-- Error message -->
       <p>{{ error() }}</p>
 
     } @else {
 
-      <!-- Database records -->
+      <!-- Number of results -->
+      <p class="results-count">
+        Showing {{ filteredSpots().length }}
+        of {{ spots().length }} loaded foraging spots
+      </p>
+
+      <!-- Filtered database cards -->
       <div class="feature-grid">
 
-        @for (spot of spots(); track spot.spot_id) {
+        @for (spot of filteredSpots(); track spot.spot_id) {
 
           <article class="feature-card">
 
@@ -131,7 +175,10 @@
 
         } @empty {
 
-          <p>No foraging spots found.</p>
+          <p>
+            No foraging spots match your search.
+            Try another plant name or category.
+          </p>
 
         }
 
@@ -141,42 +188,42 @@
 
   </section>
 
-  <!-- Project information -->
+  <!-- About the project -->
   <section class="about" id="about">
-
     <div class="container">
 
       <h2>About This Project</h2>
 
       <p>
-        Urban Foraging Explorer is a student project
+        Urban Foraging Explorer is a web application
         developed for COM661 Coursework 2.
       </p>
 
       <p>
-        This website uses Angular for the frontend,
-        Flask for the backend API, and MongoDB
-        for storing and managing information.
+        The application uses Angular for the frontend,
+        Flask for the backend API and MongoDB for
+        database storage.
       </p>
 
       <p>
-        The project helps users explore information
-        about plant species and foraging locations.
-        All demonstration locations are fictional
-        and must not be used as real foraging guidance.
+        Users can browse and search demonstration
+        foraging records and filter plants by category.
+      </p>
+
+      <p>
+        All foraging locations are fictional.
+        This application does not provide verified
+        plant identification or harvesting guidance.
       </p>
 
     </div>
-
   </section>
 
 </main>
 
-<!-- Website footer -->
+<!-- Footer -->
 <footer class="site-footer">
-
   <p>
     COM661 Coursework 2 | Urban Foraging Explorer
   </p>
-
 </footer>
