@@ -9,7 +9,6 @@ import {
 
 import { HttpClient } from '@angular/common/http';
 
-// Structure of a foraging spot from our Flask API
 interface ForagingSpot {
   spot_id: string;
   title: string;
@@ -18,11 +17,20 @@ interface ForagingSpot {
   hazard_rating: string;
 }
 
-// Structure of the API response
+interface ForagingSpotDetail extends ForagingSpot {
+  [key: string]: unknown;
+}
+
 interface SpotsResponse {
   count: number;
   data_status: string;
   spots: ForagingSpot[];
+}
+
+// The Flask API wraps the full plant record in "spot".
+interface SpotDetailResponse {
+  data_status: string;
+  spot: ForagingSpotDetail;
 }
 
 @Component({
@@ -35,18 +43,22 @@ export class App implements OnInit {
 
   private http = inject(HttpClient);
 
-  // Database records
   spots = signal<ForagingSpot[]>([]);
-
-  // Loading and error states
   loading = signal(true);
   error = signal('');
 
-  // Search and filter values
   searchTerm = signal('');
   selectedCategory = signal('All');
 
-  // Categories taken from the loaded database records
+  selectedSpot = signal<ForagingSpotDetail | null>(null);
+  detailLoading = signal(false);
+  detailError = signal('');
+
+  selectedSpotJson = computed(() => {
+    const spot = this.selectedSpot();
+    return spot ? JSON.stringify(spot, null, 2) : '';
+  });
+
   categories = computed(() => {
     const uniqueCategories = [
       ...new Set(
@@ -59,13 +71,8 @@ export class App implements OnInit {
     return ['All', ...uniqueCategories.sort()];
   });
 
-  // Search and filter the foraging spots
   filteredSpots = computed(() => {
-
-    const search = this.searchTerm()
-      .trim()
-      .toLowerCase();
-
+    const search = this.searchTerm().trim().toLowerCase();
     const category = this.selectedCategory();
 
     return this.spots().filter(spot => {
@@ -85,23 +92,59 @@ export class App implements OnInit {
     });
   });
 
-  // Update the search text
   updateSearch(value: string): void {
     this.searchTerm.set(value);
   }
 
-  // Update the selected category
   updateCategory(value: string): void {
     this.selectedCategory.set(value);
   }
 
-  // Clear search and filters
   clearFilters(): void {
     this.searchTerm.set('');
     this.selectedCategory.set('All');
   }
 
-  // Retrieve records from Flask and MongoDB
+  // Load full details for one plant
+  openSpotDetails(spot: ForagingSpot): void {
+
+    this.selectedSpot.set(null);
+    this.detailError.set('');
+    this.detailLoading.set(true);
+
+    const spotId = encodeURIComponent(spot.spot_id);
+
+    this.http.get<SpotDetailResponse>(
+      `/spots/${spotId}`
+    ).subscribe({
+
+      next: (response) => {
+        // Read the record inside the API's "spot" field
+        if (response.spot) {
+          this.selectedSpot.set(response.spot);
+        } else {
+          this.detailError.set('Plant details were not found.');
+        }
+
+        this.detailLoading.set(false);
+      },
+
+      error: () => {
+        this.detailError.set(
+          'Unable to load plant details. Please try again.'
+        );
+        this.detailLoading.set(false);
+      }
+    });
+  }
+
+  closeSpotDetails(): void {
+    this.selectedSpot.set(null);
+    this.detailError.set('');
+    this.detailLoading.set(false);
+  }
+
+  // Load the list of foraging spots
   ngOnInit(): void {
 
     this.http.get<SpotsResponse>('/spots').subscribe({
@@ -118,7 +161,6 @@ export class App implements OnInit {
         );
         this.loading.set(false);
       }
-
     });
   }
 }
